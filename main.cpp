@@ -9,7 +9,8 @@ volatile unsigned char* const vga_memory = (volatile unsigned char*)0xA0000;
 // Game State Variables (Standard 32-bit ints)
 int ball_x = 10;
 int ball_y = 50;
-int ball_dir = 1;
+int ball_dir_x = 1;
+int ball_dir_y = 1;
 
 int right_paddle_y = 90;
 int left_paddle_y = 90;
@@ -79,17 +80,28 @@ void kernel_main() {
         }
 
         // Update Ball
-        ball_x += ball_dir;
+        ball_x += ball_dir_x;
+        ball_y += ball_dir_y;
 
-        // if (ball_x >= 310) ball_dir = -1;
-        // if (ball_x <= 10)  ball_dir = 1;
+        // if (ball_x >= 310) ball_dir_x = -1;
+        // if (ball_x <= 10)  ball_dir_x = 1;
 
         if (ball_y >= right_paddle_y && ball_y <= right_paddle_y + 20 && ball_x >= 299 && ball_x <= 310) {
-            ball_dir = -1;
+            ball_dir_x = -1;
+            if (right_paddle_direction != 0) {
+                ball_dir_y = right_paddle_direction; // Add vertical spin based on paddle movement
+            }
         }
 
         if (ball_y >= left_paddle_y && ball_y <= left_paddle_y + 20 && ball_x >= 10 && ball_x <= 21) {
-            ball_dir = 1;
+            ball_dir_x = 1;
+            if (left_paddle_direction != 0) {
+                ball_dir_y = left_paddle_direction; // Add vertical spin based on paddle movement
+            }
+        }
+
+        if (ball_y <= 0 || ball_y >= 199) {
+            ball_dir_y = -ball_dir_y; // Bounce off top and bottom walls
         }
 
         // Render Ball
