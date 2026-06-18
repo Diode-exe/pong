@@ -24,7 +24,7 @@ void draw_pixel(int x, int y, unsigned char color) {
 }
 
 void delay() {
-    // 32-bit CPUs execute loops insanely fast; bump the limit up so it's visible
+    // 32-bit CPUs execute loops insanely fast
     for (volatile int i = 0; i < 4000000; i++);
 }
 
@@ -37,6 +37,9 @@ unsigned char read_keyboard_port() {
 
 void kernel_main() {
     while (true) {
+        left_paddle_direction = 0;
+        right_paddle_direction = 0;
+
         // Clear previous ball position
         draw_pixel(ball_x, ball_y, 0x00);
 
@@ -46,23 +49,27 @@ void kernel_main() {
         if (key == 0x48 && right_paddle_y > 0) {
             for(int i = 0; i < 4; i++) draw_pixel(300, right_paddle_y + 16 + i, 0x00);
             right_paddle_y -= 4;
+            right_paddle_direction = -1;
         }
         // Right Paddle Down (Down Arrow)
         if (key == 0x50 && right_paddle_y < 180) {
             for(int i = 0; i < 4; i++) draw_pixel(300, right_paddle_y + i, 0x00);
             right_paddle_y += 4;
+            right_paddle_direction = 1;
         }
 
         // Left Paddle Up (W Key)
         if (key == 0x11 && left_paddle_y > 0) {
             for(int i = 0; i < 4; i++) draw_pixel(20, left_paddle_y + 16 + i, 0x00);
             left_paddle_y -= 4;
+            left_paddle_direction = -1;
         }
 
         // Left Paddle Down (S Key)
         if (key == 0x1F && left_paddle_y < 180) {
             for(int i = 0; i < 4; i++) draw_pixel(20, left_paddle_y + i, 0x00);
             left_paddle_y += 4;
+            left_paddle_direction = 1;
         }
 
         // Render Paddles
