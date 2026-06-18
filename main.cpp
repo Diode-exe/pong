@@ -18,6 +18,9 @@ int left_paddle_y = 90;
 int left_paddle_direction = 0; // -1 for up, 1 for down, 0 for stationary
 int right_paddle_direction = 0; // -1 for up, 1 for down, 0 for stationary
 
+int right_score = 0;
+int left_score = 0;
+
 void draw_pixel(int x, int y, unsigned char color) {
     if (x >= 0 && x < 320 && y >= 0 && y < 200) {
         vga_memory[y * 320 + x] = color;
@@ -102,6 +105,21 @@ void kernel_main() {
 
         if (ball_y <= 0 || ball_y >= 199) {
             ball_dir_y = -ball_dir_y; // Bounce off top and bottom walls
+        }
+
+        if (ball_x < 0 || ball_x > 319) {
+            // Reset ball to center if it goes out of bounds
+            ball_x = 160;
+            ball_y = 100;
+            ball_dir_x = 1;
+            ball_dir_y = 1;
+        }
+
+        if (ball_x < 0) {
+            left_score++;
+        }
+        if (ball_x > 319) {
+            right_score++;
         }
 
         // Render Ball
