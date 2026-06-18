@@ -52,6 +52,18 @@ void kernel_main() {
             right_paddle_y += 4;
         }
 
+        // Left Paddle Up (W Key)
+        if (key == 0x11 && left_paddle_y > 0) {
+            for(int i = 0; i < 4; i++) draw_pixel(20, left_paddle_y + 16 + i, 0x00);
+            left_paddle_y -= 4;
+        }
+
+        // Left Paddle Down (S Key)
+        if (key == 0x1F && left_paddle_y < 180) {
+            for(int i = 0; i < 4; i++) draw_pixel(20, left_paddle_y + i, 0x00);
+            left_paddle_y += 4;
+        }
+
         // Render Paddles
         for (int i = 0; i < 20; i++) {
             draw_pixel(300, right_paddle_y + i, 0x0F);
@@ -61,8 +73,16 @@ void kernel_main() {
         // Update Ball
         ball_x += ball_dir;
 
-        if (ball_x >= 310) ball_dir = -1;
-        if (ball_x <= 10)  ball_dir = 1;
+        // if (ball_x >= 310) ball_dir = -1;
+        // if (ball_x <= 10)  ball_dir = 1;
+
+        if (ball_y >= right_paddle_y && ball_y <= right_paddle_y + 20 && ball_x >= 299 && ball_x <= 310) {
+            ball_dir = -1;
+        }
+
+        if (ball_y >= left_paddle_y && ball_y <= left_paddle_y + 20 && ball_x >= 10 && ball_x <= 21) {
+            ball_dir = 1;
+        }
 
         // Render Ball
         draw_pixel(ball_x, ball_y, 0x0F);
