@@ -14,6 +14,9 @@ int ball_dir = 1;
 int right_paddle_y = 90;
 int left_paddle_y = 90;
 
+int left_paddle_direction = 0; // -1 for up, 1 for down, 0 for stationary
+int right_paddle_direction = 0; // -1 for up, 1 for down, 0 for stationary
+
 void draw_pixel(int x, int y, unsigned char color) {
     if (x >= 0 && x < 320 && y >= 0 && y < 200) {
         vga_memory[y * 320 + x] = color;
@@ -33,8 +36,6 @@ unsigned char read_keyboard_port() {
 }
 
 void kernel_main() {
-    // Note: GRUB boots into text mode by default. Even without video mode 13h initialized yet,
-    // this loop will run and verify your pipeline doesn't hang QEMU.
     while (true) {
         // Clear previous ball position
         draw_pixel(ball_x, ball_y, 0x00);
