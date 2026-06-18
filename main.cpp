@@ -26,7 +26,6 @@ void delay() {
 }
 
 // Read keys directly from the motherboard's I/O port 0x60
-// (Since BIOS 'int 0x16' is dead in 32-bit mode)
 unsigned char read_keyboard_port() {
     unsigned char result;
     __asm__ volatile("inb $0x60, %0" : "=a"(result));
