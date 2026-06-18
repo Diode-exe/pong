@@ -1,3 +1,5 @@
+#include "font8x8_basic.h"
+
 extern "C" {
     // This is the entry point function that multiboot.asm calls
     void kernel_main();
@@ -24,6 +26,16 @@ int left_score = 0;
 void draw_pixel(int x, int y, unsigned char color) {
     if (x >= 0 && x < 320 && y >= 0 && y < 200) {
         vga_memory[y * 320 + x] = color;
+    }
+}
+
+void draw_char(int x, int y, char c, unsigned char color) {
+    for (int row = 0; row < 8; row++) {
+        for (int col = 0; col < 8; col++) {
+            if (font8x8_basic[c][row] & (1 << col)) {
+                draw_pixel(x + col, y + row, color);
+            }
+        }
     }
 }
 
@@ -107,7 +119,14 @@ void kernel_main() {
             ball_dir_y = -ball_dir_y; // Bounce off top and bottom walls
         }
 
-        if (ball_x < 0 || ball_x > 319) {
+        if (ball_x <= 0) {
+            left_score++;
+        }
+        if (ball_x >= 319) {
+            right_score++;
+        }
+
+        if (ball_x <= 0 || ball_x >= 319) {
             // Reset ball to center if it goes out of bounds
             ball_x = 160;
             ball_y = 100;
@@ -115,15 +134,12 @@ void kernel_main() {
             ball_dir_y = 1;
         }
 
-        if (ball_x < 0) {
-            left_score++;
-        }
-        if (ball_x > 319) {
-            right_score++;
-        }
-
         // Render Ball
         draw_pixel(ball_x, ball_y, 0x0F);
+
+        // Render Scores
+        draw_char(140, 10, '0' + left_score, 0x0F);
+        draw_char(180, 10, '0' + right_score, 0x0F);
 
         delay();
     }
