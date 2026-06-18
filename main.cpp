@@ -149,9 +149,12 @@ void kernel_main() {
 
         // Render Scores
 
-        // Cap scores at 9 to prevent pulling garbage ASCII characters out of the array
         draw_char(140, 10, '0' + (left_score), 0x0F);
         draw_char(180, 10, '0' + (right_score), 0x0F);
+
+        for (int i = 0; i < 200; i++) {
+            vga_memory[i * 320 + 160] = 0x0F; // Draw center line
+        }
 
         delay();
     }
