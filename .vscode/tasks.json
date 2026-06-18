@@ -1,0 +1,17 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build and Run Pong",
+            "type": "shell",
+            "command": "nasm -f elf32 multiboot.asm -o multiboot.o && g++ -m32 -c main.cpp -o main.o -ffreestanding -O2 -fno-exceptions -fno-rtti && ld -m elf_i386 -T linker.ld multiboot.o main.o -o kernel.bin && mkdir -p iso_root/boot/grub && cp kernel.bin iso_root/boot/ && echo -e 'set timeout=0\\nset default=0\\nmenuentry \"Pong\" {\\n    multiboot /boot/kernel.bin\\n    boot\\n}' > iso_root/boot/grub/grub.cfg && grub-mkrescue -o pong.iso iso_root && qemu-system-i386 -cdrom pong.iso",
+            "options": {
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}
