@@ -33,13 +33,12 @@ void draw_pixel(int x, int y, unsigned char color) {
 }
 
 void draw_char(int x, int y, char c, unsigned char color) {
-    // it draws it backwards so this fixes it
-    for (int row = 8; row > 0; row--) {
+    for (int row = 0; row < 8; row++) {
         for (int col = 0; col < 8; col++) {
             if (font8x8_basic[(unsigned char)c][row] & (0x80 >> col)) {
-                draw_pixel(x + col, y + row, color); // Draw the text pixel
+                draw_pixel(x + (7 - col), y + row, color);
             } else {
-                draw_pixel(x + col, y + row, 0x00);  // Draw black
+                draw_pixel(x + (7 - col), y + row, 0x00);
             }
         }
     }
