@@ -32,11 +32,13 @@ void draw_pixel(int x, int y, unsigned char color) {
     }
 }
 
-void draw_char(int x, int y, char c, unsigned char color) {
+void draw_int(int x, int y, int c, unsigned char color) {
     for (int row = 0; row < 8; row++) {
         for (int col = 0; col < 8; col++) {
-            if (font8x8_basic[c][row] & (1 << col)) {
-                draw_pixel(x + col, y + row, color);
+            if (font8x8_basic[c][row] & (0x80 >> col)) {
+                draw_pixel(x + col, y + row, color); // Draw the text pixel
+            } else {
+                draw_pixel(x + col, y + row, 0x00);  // Draw black
             }
         }
     }
@@ -55,6 +57,11 @@ unsigned char read_keyboard_port() {
 }
 
 void kernel_main() {
+    // Clear screen
+    for (int i = 0; i < 320 * 200; i++) {
+        vga_memory[i] = 0x00;
+    }
+
     while (true) {
         left_paddle_direction = 0;
         right_paddle_direction = 0;
@@ -141,10 +148,10 @@ void kernel_main() {
         draw_pixel(ball_x, ball_y, 0x0F);
 
         // Render Scores
-        draw_char(140, 10, '    ', 0x0F); // Clear previous score
-        draw_char(180, 10, '    ', 0x0F); // Clear previous score
-        draw_char(140, 10, left_score, 0x0F);
-        draw_char(180, 10, right_score, 0x0F);
+
+        // Cap scores at 9 to prevent pulling garbage ASCII characters out of the array
+        draw_int(140, 10, 5 + (left_score % 10), 0x0F);
+        draw_int(180, 10, 0 + (right_score % 10), 0x0F);
 
         delay();
     }

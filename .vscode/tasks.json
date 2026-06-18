@@ -4,7 +4,7 @@
         {
             "label": "Build and Run Pong",
             "type": "shell",
-            "command": "nasm -f elf32 multiboot.asm -o multiboot.o && g++ -m32 -c main.cpp -o main.o -ffreestanding -O2 -fno-exceptions -fno-rtti -w && ld -m elf_i386 -T linker.ld multiboot.o main.o -o kernel.bin && grub-mkrescue -o pong.iso iso_root && qemu-system-i386 -cdrom pong.iso",
+            "command": "nasm -f elf32 multiboot.asm -o multiboot.o && g++ -m32 -c main.cpp -o main.o -ffreestanding -O2 -fno-exceptions -fno-rtti -w && ld -m elf_i386 -T linker.ld multiboot.o main.o -o iso_root/boot/kernel.bin && grub-mkrescue -o pong.iso iso_root && qemu-system-i386 -cdrom pong.iso",
             "options": {
             },
             "group": {
