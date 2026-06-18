@@ -1,4 +1,7 @@
+//--------------------
+// from https://github.com/dhepper/font8x8/blob/master/font8x8_basic.h
 #include "font8x8_basic.h"
+// --------------------
 
 extern "C" {
     // This is the entry point function that multiboot.asm calls
@@ -120,26 +123,28 @@ void kernel_main() {
         }
 
         if (ball_x <= 0) {
-            left_score++;
-        }
-        if (ball_x >= 319) {
-            right_score++;
-        }
-
-        if (ball_x <= 0 || ball_x >= 319) {
-            // Reset ball to center if it goes out of bounds
             ball_x = 160;
             ball_y = 100;
             ball_dir_x = 1;
             ball_dir_y = 1;
+            left_score++;
+        }
+        if (ball_x >= 319) {
+            ball_x = 160;
+            ball_y = 100;
+            ball_dir_x = -1;
+            ball_dir_y = 1;
+            right_score++;
         }
 
         // Render Ball
         draw_pixel(ball_x, ball_y, 0x0F);
 
         // Render Scores
-        draw_char(140, 10, '0' + left_score, 0x0F);
-        draw_char(180, 10, '0' + right_score, 0x0F);
+        draw_char(140, 10, '    ', 0x0F); // Clear previous score
+        draw_char(180, 10, '    ', 0x0F); // Clear previous score
+        draw_char(140, 10, left_score, 0x0F);
+        draw_char(180, 10, right_score, 0x0F);
 
         delay();
     }
