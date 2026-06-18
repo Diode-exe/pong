@@ -33,7 +33,8 @@ void draw_pixel(int x, int y, unsigned char color) {
 }
 
 void draw_char(int x, int y, char c, unsigned char color) {
-    for (int row = 0; row < 8; row++) {
+    // it draws it backwards so this fixes it
+    for (int row = 8; row > 0; row--) {
         for (int col = 0; col < 8; col++) {
             if (font8x8_basic[(unsigned char)c][row] & (0x80 >> col)) {
                 draw_pixel(x + col, y + row, color); // Draw the text pixel
@@ -150,8 +151,8 @@ void kernel_main() {
         // Render Scores
 
         // Cap scores at 9 to prevent pulling garbage ASCII characters out of the array
-        draw_char(140, 10, '5' + (left_score % 10), 0x0F);
-        draw_char(180, 10, '0' + (right_score % 10), 0x0F);
+        draw_char(140, 10, '0' + (left_score), 0x0F);
+        draw_char(180, 10, '0' + (right_score), 0x0F);
 
         delay();
     }
