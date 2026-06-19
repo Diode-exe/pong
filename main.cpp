@@ -111,14 +111,14 @@ void kernel_main() {
         // if (ball_x >= 310) ball_dir_x = -1;
         // if (ball_x <= 10)  ball_dir_x = 1;
 
-        if (ball_y >= right_paddle_y && ball_y <= right_paddle_y + 20 && ball_x >= 299 && ball_x <= 310) {
+        if (ball_y >= right_paddle_y && ball_y <= right_paddle_y + 20 && ball_x >= 299 && ball_x <= 301) {
             ball_dir_x = -1;
             if (right_paddle_direction != 0) {
                 ball_dir_y = right_paddle_direction; // Add vertical spin based on paddle movement
             }
         }
 
-        if (ball_y >= left_paddle_y && ball_y <= left_paddle_y + 20 && ball_x >= 10 && ball_x <= 21) {
+        if (ball_y >= left_paddle_y && ball_y <= left_paddle_y + 20 && ball_x >= 19 && ball_x <= 21) {
             ball_dir_x = 1;
             if (left_paddle_direction != 0) {
                 ball_dir_y = left_paddle_direction; // Add vertical spin based on paddle movement
