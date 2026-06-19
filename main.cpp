@@ -134,14 +134,14 @@ void kernel_main() {
             ball_y = 100;
             ball_dir_x = 1;
             ball_dir_y = 1;
-            left_score++;
+            right_score++;
         }
         if (ball_x >= 319) {
             ball_x = 160;
             ball_y = 100;
             ball_dir_x = -1;
             ball_dir_y = 1;
-            right_score++;
+            left_score++;
         }
 
         // Render Ball
