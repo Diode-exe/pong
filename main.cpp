@@ -47,44 +47,71 @@ void draw_char(int x, int y, char c, unsigned char color) {
 }
 
 void draw_start_screen() {
-    draw_char(120, 80, 'P', 0x0F);
-    draw_char(128, 80, 'O', 0x0F);
-    draw_char(136, 80, 'N', 0x0F);
-    draw_char(144, 80, 'G', 0x0F);
+    int i = 100;
+    draw_char(i, 80, 'P', 0x0F);
+    i += 8;
+    draw_char(i, 80, 'O', 0x0F);
+    i += 8;
+    draw_char(i, 80, 'N', 0x0F);
+    i += 8;
+    draw_char(i, 80, 'G', 0x0F);
 
-    draw_char(100, 120, 'P', 0x0F);
-    draw_char(108, 120, 'r', 0x0F);
-    draw_char(116, 120, 'e', 0x0F);
-    draw_char(124, 120, 's', 0x0F);
-    draw_char(132, 120, 's', 0x0F);
+    i = 100;
 
-    draw_char(140, 120, ' ', 0x0F);
+    draw_char(i, 120, 'P', 0x0F);
+    i += 8;
+    draw_char(i, 120, 'r', 0x0F);
+    i += 8;
+    draw_char(i, 120, 'e', 0x0F);
+    i += 8;
+    draw_char(i, 120, 's', 0x0F);
+    i += 8;
+    draw_char(i, 120, 's', 0x0F);
 
-    draw_char(148, 120, 'E', 0x0F);
-    draw_char(156, 120, 'n', 0x0F);
-    draw_char(164, 120, 't', 0x0F);
-    draw_char(172, 120, 'e', 0x0F);
-    draw_char(180, 120, 'r', 0x0F);
+    draw_char(i, 120, ' ', 0x0F);
+    i += 8;
 
-    draw_char(188, 120, ' ', 0x0F);
+    draw_char(i, 120, 'E', 0x0F);
+    i += 8;
+    draw_char(i, 120, 'n', 0x0F);
+    i += 8;
+    draw_char(i, 120, 't', 0x0F);
+    i += 8;
+    draw_char(i, 120, 'e', 0x0F);
+    i += 8;
+    draw_char(i, 120, 'r', 0x0F);
+    i += 8;
 
+    draw_char(i, 120, ' ', 0x0F);
+    i += 8;
 
-    draw_char(196, 120, 'K', 0x0F);
-    draw_char(204, 120, 'e', 0x0F);
-    draw_char(212, 120, 'y', 0x0F);
+    draw_char(i, 120, 'K', 0x0F);
+    i += 8;
+    draw_char(i, 120, 'e', 0x0F);
+    i += 8;
+    draw_char(i, 120, 'y', 0x0F);
+    i += 8;
 
-    draw_char(220, 120, ' ', 0x0F);
+    draw_char(i, 120, ' ', 0x0F);
+    i += 8;
 
-    draw_char(228, 120, 'T', 0x0F);
-    draw_char(236, 120, 'o', 0x0F);
+    draw_char(i, 120, 'T', 0x0F);
+    i += 8;
+    draw_char(i, 120, 'o', 0x0F);
+    i += 8;
 
-    draw_char(244, 120, ' ', 0x0F);
+    draw_char(i, 120, ' ', 0x0F);
+    i += 8;
 
-    draw_char(252, 120, 'S', 0x0F);
-    draw_char(260, 120, 't', 0x0F);
-    draw_char(268, 120, 'a', 0x0F);
-    draw_char(276, 120, 'r', 0x0F);
-    draw_char(284, 120, 't', 0x0F);
+    draw_char(i, 120, 'S', 0x0F);
+    i += 8;
+    draw_char(i, 120, 't', 0x0F);
+    i += 8;
+    draw_char(i, 120, 'a', 0x0F);
+    i += 8;
+    draw_char(i, 120, 'r', 0x0F);
+    i += 8;
+    draw_char(i, 120, 't', 0x0F);
 }
 
 void delay() {
