@@ -26,6 +26,8 @@ int right_paddle_direction = 0; // -1 for up, 1 for down, 0 for stationary
 int right_score = 0;
 int left_score = 0;
 
+bool past_start_screen = false;
+
 void draw_pixel(int x, int y, unsigned char color) {
     if (x >= 0 && x < 320 && y >= 0 && y < 200) {
         vga_memory[y * 320 + x] = color;
@@ -42,6 +44,38 @@ void draw_char(int x, int y, char c, unsigned char color) {
             }
         }
     }
+}
+
+void draw_start_screen() {
+    draw_char(120, 80, 'P', 0x0F);
+    draw_char(128, 80, 'O', 0x0F);
+    draw_char(136, 80, 'N', 0x0F);
+    draw_char(144, 80, 'G', 0x0F);
+
+    draw_char(100, 120, 'P', 0x0F);
+    draw_char(108, 120, 'r', 0x0F);
+    draw_char(116, 120, 'e', 0x0F);
+    draw_char(124, 120, 's', 0x0F);
+    draw_char(132, 120, 's', 0x0F);
+
+    draw_char(140, 120, 'E', 0x0F);
+    draw_char(148, 120, 'n', 0x0F);
+    draw_char(156, 120, 't', 0x0F);
+    draw_char(164, 120, 'e', 0x0F);
+    draw_char(172, 120, 'r', 0x0F);
+
+    draw_char(180, 120, 'K', 0x0F);
+    draw_char(188, 120, 'e', 0x0F);
+    draw_char(196, 120, 'y', 0x0F);
+
+    draw_char(220, 120, 'T', 0x0F);
+    draw_char(228, 120, 'o', 0x0F);
+
+    draw_char(260, 120, 'S', 0x0F);
+    draw_char(268, 120, 't', 0x0F);
+    draw_char(276, 120, 'a', 0x0F);
+    draw_char(284, 120, 'r', 0x0F);
+    draw_char(292, 120, 't', 0x0F);
 }
 
 void delay() {
@@ -62,7 +96,16 @@ void kernel_main() {
         vga_memory[i] = 0x00;
     }
 
+    while (!past_start_screen) {
+        draw_start_screen();
+        if (read_keyboard_port() == 0x1C) { // Enter key
+            past_start_screen = true;
+        }
+
+    }
+
     while (true) {
+
         left_paddle_direction = 0;
         right_paddle_direction = 0;
 
