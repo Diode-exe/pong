@@ -58,24 +58,33 @@ void draw_start_screen() {
     draw_char(124, 120, 's', 0x0F);
     draw_char(132, 120, 's', 0x0F);
 
-    draw_char(140, 120, 'E', 0x0F);
-    draw_char(148, 120, 'n', 0x0F);
-    draw_char(156, 120, 't', 0x0F);
-    draw_char(164, 120, 'e', 0x0F);
-    draw_char(172, 120, 'r', 0x0F);
+    draw_char(140, 120, ' ', 0x0F);
 
-    draw_char(180, 120, 'K', 0x0F);
-    draw_char(188, 120, 'e', 0x0F);
-    draw_char(196, 120, 'y', 0x0F);
+    draw_char(148, 120, 'E', 0x0F);
+    draw_char(156, 120, 'n', 0x0F);
+    draw_char(164, 120, 't', 0x0F);
+    draw_char(172, 120, 'e', 0x0F);
+    draw_char(180, 120, 'r', 0x0F);
 
-    draw_char(220, 120, 'T', 0x0F);
-    draw_char(228, 120, 'o', 0x0F);
+    draw_char(188, 120, ' ', 0x0F);
 
-    draw_char(260, 120, 'S', 0x0F);
-    draw_char(268, 120, 't', 0x0F);
-    draw_char(276, 120, 'a', 0x0F);
-    draw_char(284, 120, 'r', 0x0F);
-    draw_char(292, 120, 't', 0x0F);
+
+    draw_char(196, 120, 'K', 0x0F);
+    draw_char(204, 120, 'e', 0x0F);
+    draw_char(212, 120, 'y', 0x0F);
+
+    draw_char(220, 120, ' ', 0x0F);
+
+    draw_char(228, 120, 'T', 0x0F);
+    draw_char(236, 120, 'o', 0x0F);
+
+    draw_char(244, 120, ' ', 0x0F);
+
+    draw_char(252, 120, 'S', 0x0F);
+    draw_char(260, 120, 't', 0x0F);
+    draw_char(268, 120, 'a', 0x0F);
+    draw_char(276, 120, 'r', 0x0F);
+    draw_char(284, 120, 't', 0x0F);
 }
 
 void delay() {
@@ -100,8 +109,10 @@ void kernel_main() {
         draw_start_screen();
         if (read_keyboard_port() == 0x1C) { // Enter key
             past_start_screen = true;
+            for (int i = 0; i < 320 * 200; i++) {
+                vga_memory[i] = 0x00;
+            }
         }
-
     }
 
     while (true) {
