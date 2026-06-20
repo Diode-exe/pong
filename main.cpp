@@ -46,72 +46,15 @@ void draw_char(int x, int y, char c, unsigned char color) {
     }
 }
 
+void draw_string(int x, int y, const char* str, unsigned char color) {
+    for (int i = 0; str[i] != '\0'; i++) {
+        draw_char(x + i * 8, y, str[i], color);
+    }
+}
+
 void draw_start_screen() {
-    int i = 100;
-    draw_char(i, 80, 'P', 0x0F);
-    i += 8;
-    draw_char(i, 80, 'O', 0x0F);
-    i += 8;
-    draw_char(i, 80, 'N', 0x0F);
-    i += 8;
-    draw_char(i, 80, 'G', 0x0F);
-
-    i = 100;
-
-    draw_char(i, 120, 'P', 0x0F);
-    i += 8;
-    draw_char(i, 120, 'r', 0x0F);
-    i += 8;
-    draw_char(i, 120, 'e', 0x0F);
-    i += 8;
-    draw_char(i, 120, 's', 0x0F);
-    i += 8;
-    draw_char(i, 120, 's', 0x0F);
-
-    draw_char(i, 120, ' ', 0x0F);
-    i += 8;
-
-    draw_char(i, 120, 'E', 0x0F);
-    i += 8;
-    draw_char(i, 120, 'n', 0x0F);
-    i += 8;
-    draw_char(i, 120, 't', 0x0F);
-    i += 8;
-    draw_char(i, 120, 'e', 0x0F);
-    i += 8;
-    draw_char(i, 120, 'r', 0x0F);
-    i += 8;
-
-    draw_char(i, 120, ' ', 0x0F);
-    i += 8;
-
-    draw_char(i, 120, 'K', 0x0F);
-    i += 8;
-    draw_char(i, 120, 'e', 0x0F);
-    i += 8;
-    draw_char(i, 120, 'y', 0x0F);
-    i += 8;
-
-    draw_char(i, 120, ' ', 0x0F);
-    i += 8;
-
-    draw_char(i, 120, 'T', 0x0F);
-    i += 8;
-    draw_char(i, 120, 'o', 0x0F);
-    i += 8;
-
-    draw_char(i, 120, ' ', 0x0F);
-    i += 8;
-
-    draw_char(i, 120, 'S', 0x0F);
-    i += 8;
-    draw_char(i, 120, 't', 0x0F);
-    i += 8;
-    draw_char(i, 120, 'a', 0x0F);
-    i += 8;
-    draw_char(i, 120, 'r', 0x0F);
-    i += 8;
-    draw_char(i, 120, 't', 0x0F);
+    draw_string(120, 80,  "PONG",                  0x0F);
+    draw_string(100, 120, "Press Enter To Start",  0x0F);
 }
 
 void delay() {
