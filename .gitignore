@@ -4,3 +4,4 @@ watcom/
 *.obj
 *.err
 *.iso
+copy_over.sh
