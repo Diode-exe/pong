@@ -48,9 +48,9 @@ void draw_char(int x, int y, char c, unsigned char color) {
     }
 }
 
-void draw_string(int x, int y, const char* str, unsigned char color) {
+void draw_string(int x, int y, const char* str, unsigned char color, int spacing = 0) {
     for (int i = 0; str[i] != '\0'; i++) {
-        draw_char(x + i * 8, y, str[i], color);
+        draw_char(x + i * (8 + spacing), y, str[i], color);
     }
 }
 
@@ -59,9 +59,33 @@ void draw_start_screen() {
     draw_string(100, 120, "Press Enter To Start",  0x0F);
 }
 
-void delay() {
-    // 32-bit CPUs execute loops insanely fast
-    for (volatile int i = 0; i < 4000000; i++);
+void delay_ms(unsigned short ms) {
+    // 1. Enable the PIT Channel 2 gate by setting the lowest two bits of system port 0x61
+    unsigned char port_61;
+    __asm__ volatile("inb $0x61, %0" : "=a"(port_61));
+    __asm__ volatile("outb %%al, $0x61" : : "a"((unsigned char)(port_61 | 0x01)));
+
+    while (ms > 0) {
+        // 2. Set PIT Channel 2 to Mode 0 (Interrupt on Terminal Count), Binary counter
+        __asm__ volatile("outb %%al, $0x43" : : "a"((unsigned char)0xB0));
+
+        // 3. Load the divisor for exactly 1 millisecond.
+        // The PIT frequency is 1193182 Hz. For 1ms, we count down from ~1193.
+        unsigned short count = 1193;
+        __asm__ volatile("outb %%al, $0x42" : : "a"((unsigned char)(count & 0xFF)));        // Low byte
+        __asm__ volatile("outb %%al, $0x42" : : "a"((unsigned char)((count >> 8) & 0xFF))); // High byte
+
+        // 4. Poll the PIT status byte until the output pin goes high (bit 7 becomes 1)
+        // indicating the 1ms countdown has finished.
+        unsigned char status = 0;
+        while (!(status & 0x80)) {
+            // Send a Read-Back Command to check the status of Channel 2
+            __asm__ volatile("outb %%al, $0x43" : : "a"((unsigned char)0xE8));
+            __asm__ volatile("inb $0x42, %0" : "=a"(status));
+        }
+
+        ms--;
+    }
 }
 
 // Read keys directly from the motherboard's I/O port 0x60
@@ -193,6 +217,6 @@ void kernel_main() {
             vga_memory[i * 320 + 160] = 0x0F; // Draw center line
         }
 
-        delay();
+        delay_ms(16); // Approximately 60 FPS
     }
 }
