@@ -30,6 +30,9 @@ bool past_start_screen = false;
 
 bool keys[256] = {false};
 
+bool paused = false;
+bool pause_key_pressed = false;
+
 void draw_pixel(int x, int y, unsigned char color) {
     if (x >= 0 && x < 320 && y >= 0 && y < 200) {
         vga_memory[y * 320 + x] = color;
@@ -105,118 +108,173 @@ void update_keys() {
     }
 }
 
-void kernel_main() {
-    // Clear screen
-    for (int i = 0; i < 320 * 200; i++) {
-        vga_memory[i] = 0x00;
-    }
-
-    while (!past_start_screen) {
-        draw_start_screen();
+void end_game() {
+    draw_string(100, 80, "Game Over!", 0x0F);
+    draw_string(80, 120, "Press Enter to Restart", 0x0F);
+    while (true) {
         if (read_keyboard_port() == 0x1C) { // Enter key
-            past_start_screen = true;
+            // Reset game state
+            ball_x = 10;
+            ball_y = 50;
+            ball_dir_x = 1;
+            ball_dir_y = 1;
+            right_paddle_y = 90;
+            left_paddle_y = 90;
+            left_score = 0;
+            right_score = 0;
+            past_start_screen = false;
+
+            // Clear screen
             for (int i = 0; i < 320 * 200; i++) {
                 vga_memory[i] = 0x00;
             }
+            break; // Exit the loop to restart the game
+        }
+    }
+}
+
+void kernel_main() {
+    if (!paused) {
+        // Clear screen
+        for (int i = 0; i < 320 * 200; i++) {
+            vga_memory[i] = 0x00;
+        }
+
+        while (!past_start_screen) {
+            draw_start_screen();
+            if (read_keyboard_port() == 0x1C) { // Enter key
+                past_start_screen = true;
+                for (int i = 0; i < 320 * 200; i++) {
+                    vga_memory[i] = 0x00;
+                }
+            }
+        }
+
+        while (true) {
+
+            left_paddle_direction = 0;
+            right_paddle_direction = 0;
+
+            // Clear previous ball position
+            draw_pixel(ball_x, ball_y, 0x00);
+
+            // unsigned char key = read_keyboard_port();
+            update_keys();
+
+            // Right Paddle Up (Up Arrow)
+            if (keys[0x48] && right_paddle_y > 0) {
+                for(int i = 0; i < 4; i++) draw_pixel(300, right_paddle_y + 16 + i, 0x00);
+                right_paddle_y -= 4;
+                right_paddle_direction = -1;
+            }
+            // Right Paddle Down (Down Arrow)
+            if (keys[0x50] && right_paddle_y < 180) {
+                for(int i = 0; i < 4; i++) draw_pixel(300, right_paddle_y + i, 0x00);
+                right_paddle_y += 4;
+                right_paddle_direction = 1;
+            }
+
+            // Left Paddle Up (W Key)
+            if (keys[0x11] && left_paddle_y > 0) {
+                for(int i = 0; i < 4; i++) draw_pixel(20, left_paddle_y + 16 + i, 0x00);
+                left_paddle_y -= 4;
+                left_paddle_direction = -1;
+            }
+
+            // Left Paddle Down (S Key)
+            if (keys[0x1F] && left_paddle_y < 180) {
+                for(int i = 0; i < 4; i++) draw_pixel(20, left_paddle_y + i, 0x00);
+                left_paddle_y += 4;
+                left_paddle_direction = 1;
+            }
+
+            // Render Paddles
+            for (int i = 0; i < 20; i++) {
+                draw_pixel(300, right_paddle_y + i, 0x0F);
+                draw_pixel(20, left_paddle_y + i, 0x0F);
+            }
+
+            // Update Ball
+            ball_x += ball_dir_x;
+            ball_y += ball_dir_y;
+
+            // if (ball_x >= 310) ball_dir_x = -1;
+            // if (ball_x <= 10)  ball_dir_x = 1;
+
+            if (ball_y >= right_paddle_y && ball_y <= right_paddle_y + 20 && ball_x >= 299 && ball_x <= 301) {
+                ball_dir_x = -1;
+                if (right_paddle_direction != 0) {
+                    ball_dir_y = right_paddle_direction; // Add vertical spin based on paddle movement
+                }
+            }
+
+            if (ball_y >= left_paddle_y && ball_y <= left_paddle_y + 20 && ball_x >= 19 && ball_x <= 21) {
+                ball_dir_x = 1;
+                if (left_paddle_direction != 0) {
+                    ball_dir_y = left_paddle_direction; // Add vertical spin based on paddle movement
+                }
+            }
+
+            if (ball_y <= 0 || ball_y >= 199) {
+                ball_dir_y = -ball_dir_y; // Bounce off top and bottom walls
+            }
+
+            if (ball_x <= 0) {
+                ball_x = 160;
+                ball_y = 100;
+                ball_dir_x = 1;
+                ball_dir_y = 1;
+                right_score++;
+            }
+            if (ball_x >= 319) {
+                ball_x = 160;
+                ball_y = 100;
+                ball_dir_x = -1;
+                ball_dir_y = 1;
+                left_score++;
+            }
+
+            // if (left_score >= 10 || right_score >= 10) {
+            //     end_game();
+            // }
+
+            // Render Ball
+            draw_pixel(ball_x, ball_y, 0x0F);
+
+            // Render Scores
+
+            draw_char(140, 10, '0' + (left_score), 0x0F);
+            draw_char(175, 10, '0' + (right_score), 0x0F);
+
+            for (int i = 0; i < 200; i++) {
+                vga_memory[i * 320 + 160] = 0x0F; // Draw center line
+            }
+
+            if (read_keyboard_port() == 0x19 && !pause_key_pressed) { // P key
+                paused = true;
+                pause_key_pressed = true;
+                for (int i = 0; i < 320 * 200; i++) {
+                    vga_memory[i] = 0x00;
+                }
+            }
+
+            delay_ms(16); // Approximately 60 FPS
         }
     }
 
-    while (true) {
-
-        left_paddle_direction = 0;
-        right_paddle_direction = 0;
-
-        // Clear previous ball position
-        draw_pixel(ball_x, ball_y, 0x00);
-
-        // unsigned char key = read_keyboard_port();
-        update_keys();
-
-        // Right Paddle Up (Up Arrow)
-        if (keys[0x48] && right_paddle_y > 0) {
-            for(int i = 0; i < 4; i++) draw_pixel(300, right_paddle_y + 16 + i, 0x00);
-            right_paddle_y -= 4;
-            right_paddle_direction = -1;
-        }
-        // Right Paddle Down (Down Arrow)
-        if (keys[0x50] && right_paddle_y < 180) {
-            for(int i = 0; i < 4; i++) draw_pixel(300, right_paddle_y + i, 0x00);
-            right_paddle_y += 4;
-            right_paddle_direction = 1;
-        }
-
-        // Left Paddle Up (W Key)
-        if (keys[0x11] && left_paddle_y > 0) {
-            for(int i = 0; i < 4; i++) draw_pixel(20, left_paddle_y + 16 + i, 0x00);
-            left_paddle_y -= 4;
-            left_paddle_direction = -1;
-        }
-
-        // Left Paddle Down (S Key)
-        if (keys[0x1F] && left_paddle_y < 180) {
-            for(int i = 0; i < 4; i++) draw_pixel(20, left_paddle_y + i, 0x00);
-            left_paddle_y += 4;
-            left_paddle_direction = 1;
-        }
-
-        // Render Paddles
-        for (int i = 0; i < 20; i++) {
-            draw_pixel(300, right_paddle_y + i, 0x0F);
-            draw_pixel(20, left_paddle_y + i, 0x0F);
-        }
-
-        // Update Ball
-        ball_x += ball_dir_x;
-        ball_y += ball_dir_y;
-
-        // if (ball_x >= 310) ball_dir_x = -1;
-        // if (ball_x <= 10)  ball_dir_x = 1;
-
-        if (ball_y >= right_paddle_y && ball_y <= right_paddle_y + 20 && ball_x >= 299 && ball_x <= 301) {
-            ball_dir_x = -1;
-            if (right_paddle_direction != 0) {
-                ball_dir_y = right_paddle_direction; // Add vertical spin based on paddle movement
+    else {
+        while (true) {
+            draw_string(100, 80, "Game Paused", 0x0F);
+            draw_string(80, 120, "Press P to Resume", 0x0F);
+            if (read_keyboard_port() == 0x19 && pause_key_pressed) { // P key
+                paused = false;
+                pause_key_pressed = false;
+                for (int i = 0; i < 320 * 200; i++) {
+                    vga_memory[i] = 0x00;
+                }
+                break; // Exit the loop to resume the game
             }
         }
-
-        if (ball_y >= left_paddle_y && ball_y <= left_paddle_y + 20 && ball_x >= 19 && ball_x <= 21) {
-            ball_dir_x = 1;
-            if (left_paddle_direction != 0) {
-                ball_dir_y = left_paddle_direction; // Add vertical spin based on paddle movement
-            }
-        }
-
-        if (ball_y <= 0 || ball_y >= 199) {
-            ball_dir_y = -ball_dir_y; // Bounce off top and bottom walls
-        }
-
-        if (ball_x <= 0) {
-            ball_x = 160;
-            ball_y = 100;
-            ball_dir_x = 1;
-            ball_dir_y = 1;
-            right_score++;
-        }
-        if (ball_x >= 319) {
-            ball_x = 160;
-            ball_y = 100;
-            ball_dir_x = -1;
-            ball_dir_y = 1;
-            left_score++;
-        }
-
-        // Render Ball
-        draw_pixel(ball_x, ball_y, 0x0F);
-
-        // Render Scores
-
-        draw_char(140, 10, '0' + (left_score), 0x0F);
-        draw_char(175, 10, '0' + (right_score), 0x0F);
-
-        for (int i = 0; i < 200; i++) {
-            vga_memory[i * 320 + 160] = 0x0F; // Draw center line
-        }
-
         delay_ms(16); // Approximately 60 FPS
     }
 }
