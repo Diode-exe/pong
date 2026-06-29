@@ -31,7 +31,6 @@ bool past_start_screen = false;
 bool keys[256] = {false};
 
 bool paused = false;
-bool pause_key_pressed = false;
 
 void draw_pixel(int x, int y, unsigned char color) {
     if (x >= 0 && x < 320 && y >= 0 && y < 200) {
@@ -134,23 +133,22 @@ void end_game() {
 }
 
 void kernel_main() {
-    if (!paused) {
-        // Clear screen
-        for (int i = 0; i < 320 * 200; i++) {
-            vga_memory[i] = 0x00;
-        }
+    // Clear screen
+    for (int i = 0; i < 320 * 200; i++) {
+        vga_memory[i] = 0x00;
+    }
 
-        while (!past_start_screen) {
-            draw_start_screen();
-            if (read_keyboard_port() == 0x1C) { // Enter key
-                past_start_screen = true;
-                for (int i = 0; i < 320 * 200; i++) {
-                    vga_memory[i] = 0x00;
-                }
+    while (!past_start_screen) {
+        draw_start_screen();
+        if (read_keyboard_port() == 0x1C) { // Enter key
+            past_start_screen = true;
+            for (int i = 0; i < 320 * 200; i++) {
+                vga_memory[i] = 0x00;
             }
         }
-
-        while (true) {
+    }
+    while (true) {
+        if (!paused) {
 
             left_paddle_direction = 0;
             right_paddle_direction = 0;
@@ -250,9 +248,8 @@ void kernel_main() {
                 vga_memory[i * 320 + 160] = 0x0F; // Draw center line
             }
 
-            if (read_keyboard_port() == 0x19 && !pause_key_pressed) { // P key
+            if (read_keyboard_port() == 0x19) { // P key
                 paused = true;
-                pause_key_pressed = true;
                 for (int i = 0; i < 320 * 200; i++) {
                     vga_memory[i] = 0x00;
                 }
@@ -260,21 +257,21 @@ void kernel_main() {
 
             delay_ms(16); // Approximately 60 FPS
         }
-    }
 
-    else {
-        while (true) {
-            draw_string(100, 80, "Game Paused", 0x0F);
-            draw_string(80, 120, "Press P to Resume", 0x0F);
-            if (read_keyboard_port() == 0x19 && pause_key_pressed) { // P key
-                paused = false;
-                pause_key_pressed = false;
-                for (int i = 0; i < 320 * 200; i++) {
-                    vga_memory[i] = 0x00;
+        else {
+            while (true) {
+                draw_string(100, 80, "Game Paused", 0x0F);
+                draw_string(80, 120, "Press P to Resume", 0x0F);
+                if (read_keyboard_port() == 0x19) { // P key
+                    paused = false;
+                    for (int i = 0; i < 320 * 200; i++) {
+                        vga_memory[i] = 0x00;
+                    }
+                    break; // Exit the loop to resume the game
                 }
-                break; // Exit the loop to resume the game
             }
+            delay_ms(16); // Approximately 60 FPS
         }
-        delay_ms(16); // Approximately 60 FPS
     }
 }
+
