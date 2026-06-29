@@ -16,6 +16,7 @@ int ball_x = 10;
 int ball_y = 50;
 int ball_dir_x = 1;
 int ball_dir_y = 1;
+float ball_speed = 1.0f;
 
 int right_paddle_y = 90;
 int left_paddle_y = 90;
@@ -197,8 +198,8 @@ void kernel_main() {
             }
 
             // Update Ball
-            ball_x += ball_dir_x;
-            ball_y += ball_dir_y;
+            ball_x += ball_dir_x * ball_speed;
+            ball_y += ball_dir_y * ball_speed;
 
             // if (ball_x >= 310) ball_dir_x = -1;
             // if (ball_x <= 10)  ball_dir_x = 1;
@@ -227,6 +228,7 @@ void kernel_main() {
                 ball_dir_x = 1;
                 ball_dir_y = 1;
                 right_score++;
+                ball_speed += 0.1f; // Increase ball speed after each score
             }
             if (ball_x >= 319) {
                 ball_x = 160;
@@ -234,6 +236,7 @@ void kernel_main() {
                 ball_dir_x = -1;
                 ball_dir_y = 1;
                 left_score++;
+                ball_speed += 0.1f; // Increase ball speed after each score
             }
 
             if (left_score >= 10 || right_score >= 10) {
