@@ -147,6 +147,7 @@ void kernel_main() {
             }
         }
     }
+
     while (true) {
         if (!paused) {
 
@@ -232,9 +233,9 @@ void kernel_main() {
                 left_score++;
             }
 
-            // if (left_score >= 10 || right_score >= 10) {
-            //     end_game();
-            // }
+            if (left_score >= 10 || right_score >= 10) {
+                end_game();
+            }
 
             // Render Ball
             draw_pixel(ball_x, ball_y, 0x0F);
@@ -274,4 +275,3 @@ void kernel_main() {
         }
     }
 }
-
