@@ -58,7 +58,10 @@ void draw_string(int x, int y, const char* str, unsigned char color, int spacing
 
 void draw_start_screen() {
     draw_string(120, 80,  "PONG",                  0x0F);
-    draw_string(100, 120, "Press Enter To Start",  0x0F);
+    draw_string(80, 100, "First to 10 Wins!",       0x0F);
+    draw_string(80, 120, "Left Paddle: W/S Keys", 0x0F);
+    draw_string(80, 140, "Right Paddle: Arrow Keys", 0x0F);
+    draw_string(80, 160, "Press Enter To Start",  0x0F);
 }
 
 void delay_ms(unsigned short ms) {
