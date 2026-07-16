@@ -112,6 +112,12 @@ void update_keys() {
     }
 }
 
+void clear_screen() {
+    for (int i = 0; i < 320 * 200; i++) {
+        vga_memory[i] = 0x00;
+    }
+}
+
 void end_game() {
     draw_string(100, 80, "Game Over!", 0x0F);
     draw_string(80, 120, "Press Enter to Restart", 0x0F);
@@ -129,10 +135,7 @@ void end_game() {
             past_start_screen = false;
             ball_speed = 1.0f;
 
-            // Clear screen
-            for (int i = 0; i < 320 * 200; i++) {
-                vga_memory[i] = 0x00;
-            }
+            clear_screen();
             break; // Exit the loop to restart the game
         }
     }
@@ -140,17 +143,13 @@ void end_game() {
 
 void kernel_main() {
     // Clear screen
-    for (int i = 0; i < 320 * 200; i++) {
-        vga_memory[i] = 0x00;
-    }
+    clear_screen();
 
     while (!past_start_screen) {
         draw_start_screen();
         if (read_keyboard_port() == 0x1C) { // Enter key
             past_start_screen = true;
-            for (int i = 0; i < 320 * 200; i++) {
-                vga_memory[i] = 0x00;
-            }
+            clear_screen();
         }
     }
 
@@ -259,9 +258,7 @@ void kernel_main() {
 
             if (read_keyboard_port() == 0x19) { // P key
                 paused = true;
-                for (int i = 0; i < 320 * 200; i++) {
-                    vga_memory[i] = 0x00;
-                }
+                clear_screen();
             }
 
             delay_ms(16); // Approximately 60 FPS
@@ -273,9 +270,7 @@ void kernel_main() {
                 draw_string(80, 120, "Press P to Resume", 0x0F);
                 if (read_keyboard_port() == 0x19) { // P key
                     paused = false;
-                    for (int i = 0; i < 320 * 200; i++) {
-                        vga_memory[i] = 0x00;
-                    }
+                    clear_screen();
                     break; // Exit the loop to resume the game
                 }
             }
