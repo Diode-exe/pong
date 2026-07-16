@@ -62,7 +62,8 @@ void draw_start_screen() {
     draw_string(80, 100, "First to 10 Wins!",       0x0F);
     draw_string(80, 120, "Left Paddle: W/S Keys", 0x0F);
     draw_string(80, 140, "Right Paddle: Arrow Keys", 0x0F);
-    draw_string(80, 160, "Press Enter To Start",  0x0F);
+    draw_string(80, 160, "Press P to Pause",            0x0F);
+    draw_string(80, 180, "Press Enter To Start",  0x0F);
 }
 
 void delay_ms(unsigned short ms) {
@@ -126,6 +127,7 @@ void end_game() {
             left_score = 0;
             right_score = 0;
             past_start_screen = false;
+            ball_speed = 1.0f;
 
             // Clear screen
             for (int i = 0; i < 320 * 200; i++) {
