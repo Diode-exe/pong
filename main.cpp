@@ -141,6 +141,18 @@ void end_game() {
     }
 }
 
+void game_pause() {
+    draw_string(100, 80, "Game Paused", 0x0F);
+    draw_string(80, 120, "Press P to Resume", 0x0F);
+    while (true) {
+        if (read_keyboard_port() == 0x19) { // P key
+            paused = false;
+            clear_screen();
+            break; // Exit the loop to resume the game
+        }
+    }
+}
+
 void kernel_main() {
     // Clear screen
     clear_screen();
@@ -265,15 +277,7 @@ void kernel_main() {
         }
 
         else {
-            while (true) {
-                draw_string(100, 80, "Game Paused", 0x0F);
-                draw_string(80, 120, "Press P to Resume", 0x0F);
-                if (read_keyboard_port() == 0x19) { // P key
-                    paused = false;
-                    clear_screen();
-                    break; // Exit the loop to resume the game
-                }
-            }
+            game_pause();
             delay_ms(16); // Approximately 60 FPS
         }
     }
