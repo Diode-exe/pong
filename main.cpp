@@ -38,6 +38,8 @@ bool keys[256] = {false};
 
 bool paused = false;
 
+int game_color = 0x0F; // default white
+
 void draw_pixel(int x, int y, unsigned char color) {
     if (x >= 0 && x < 320 && y >= 0 && y < 200) {
         vga_memory[y * 320 + x] = color;
@@ -63,12 +65,12 @@ void draw_string(int x, int y, const char* str, unsigned char color, int spacing
 }
 
 void draw_start_screen() {
-    draw_string(120, 80,  "PONG",                  0x0F);
-    draw_string(80, 100, "First to 10 Wins!",       0x0F);
-    draw_string(80, 120, "Left Paddle: W/S Keys", 0x0F);
-    draw_string(80, 140, "Right Paddle: Arrow Keys", 0x0F);
-    draw_string(80, 160, "Press P to Pause",            0x0F);
-    draw_string(80, 180, "Press Enter To Start",  0x0F);
+    draw_string(120, 80,  "PONG",                  game_color);
+    draw_string(80, 100, "First to 10 Wins!",       game_color);
+    draw_string(80, 120, "Left Paddle: W/S Keys", game_color);
+    draw_string(80, 140, "Right Paddle: Arrow Keys", game_color);
+    draw_string(80, 160, "Press P to Pause",            game_color);
+    draw_string(80, 180, "Press Enter To Start",  game_color);
 }
 
 void delay_ms(unsigned short ms) {
@@ -124,8 +126,8 @@ void clear_screen() {
 }
 
 void end_game() {
-    draw_string(100, 80, "Game Over!", 0x0F);
-    draw_string(80, 120, "Press Enter to Restart", 0x0F);
+    draw_string(100, 80, "Game Over!", game_color);
+    draw_string(80, 120, "Press Enter to Restart", game_color);
     while (true) {
         if (read_keyboard_port() == 0x1C) { // Enter key
             // Reset game state
@@ -147,8 +149,8 @@ void end_game() {
 }
 
 void game_pause() {
-    draw_string(100, 80, "Game Paused", 0x0F);
-    draw_string(80, 120, "Press P to Resume", 0x0F);
+    draw_string(100, 80, "Game Paused", game_color);
+    draw_string(80, 120, "Press P to Resume", game_color);
     while (true) {
         if (read_keyboard_port() == 0x19) { // P key
             paused = false;
@@ -156,6 +158,12 @@ void game_pause() {
             break; // Exit the loop to resume the game
         }
     }
+}
+
+void palette_change() {
+    game_color = (game_color + 1) % 16; // Cycle through colors 0-15
+    // Clear the screen to apply the new color scheme
+    clear_screen();
 }
 
 void kernel_main() {
@@ -209,10 +217,15 @@ void kernel_main() {
                 left_paddle_direction = 1;
             }
 
+            if (keys[0x14]) { // L key for palette change
+                palette_change();
+                keys[0x14] = false; // Reset the key state to prevent continuous cycling
+            }
+
             // Render Paddles
             for (int i = 0; i < 20; i++) {
-                draw_pixel(300, right_paddle_y + i, 0x0F);
-                draw_pixel(20, left_paddle_y + i, 0x0F);
+                draw_pixel(300, right_paddle_y + i, game_color);
+                draw_pixel(20, left_paddle_y + i, game_color);
             }
 
             // Update Ball
@@ -262,15 +275,15 @@ void kernel_main() {
             }
 
             // Render Ball
-            draw_pixel(ball_x, ball_y, 0x0F);
+            draw_pixel(ball_x, ball_y, game_color);
 
             // Render Scores
 
-            draw_char(140, 10, '0' + (left_score), 0x0F);
-            draw_char(175, 10, '0' + (right_score), 0x0F);
+            draw_char(140, 10, '0' + (left_score), game_color);
+            draw_char(175, 10, '0' + (right_score), game_color);
 
             for (int i = 0; i < 200; i++) {
-                vga_memory[i * 320 + 160] = 0x0F; // Draw center line
+                vga_memory[i * 320 + 160] = game_color; // Draw center line
             }
 
             if (read_keyboard_port() == 0x19) { // P key
@@ -281,25 +294,25 @@ void kernel_main() {
             // elegant solution
             dateTimeValues dt = read_rtc();
 
-            draw_char(80, 180, '0' + (dt.hour / 10), 0x0F);
-            draw_char(88, 180, '0' + (dt.hour % 10), 0x0F);
-            draw_char(96, 180, ':', 0x0F);
-            draw_char(104, 180, '0' + (dt.minute / 10), 0x0F);
-            draw_char(112, 180, '0' + (dt.minute % 10), 0x0F);
-            draw_char(120, 180, ':', 0x0F);
-            draw_char(128, 180, '0' + (dt.second / 10), 0x0F);
-            draw_char(136, 180, '0' + (dt.second % 10), 0x0F);
+            draw_char(80, 180, '0' + (dt.hour / 10), game_color);
+            draw_char(88, 180, '0' + (dt.hour % 10), game_color);
+            draw_char(96, 180, ':', game_color);
+            draw_char(104, 180, '0' + (dt.minute / 10), game_color);
+            draw_char(112, 180, '0' + (dt.minute % 10), game_color);
+            draw_char(120, 180, ':', game_color);
+            draw_char(128, 180, '0' + (dt.second / 10), game_color);
+            draw_char(136, 180, '0' + (dt.second % 10), game_color);
 
-            draw_char(184, 180, '0' + ((dt.year / 1000) % 10), 0x0F);
-            draw_char(192, 180, '0' + ((dt.year / 100) % 10), 0x0F);
-            draw_char(200, 180, '0' + ((dt.year / 10) % 10), 0x0F);
-            draw_char(208, 180, '0' + (dt.year % 10), 0x0F);
-            draw_char(216, 180, '/', 0x0F);
-            draw_char(224, 180, '0' + (dt.month / 10), 0x0F);
-            draw_char(232, 180, '0' + (dt.month % 10), 0x0F);
-            draw_char(240, 180, '/', 0x0F);
-            draw_char(248, 180, '0' + (dt.day / 10), 0x0F);
-            draw_char(256, 180, '0' + (dt.day % 10), 0x0F);
+            draw_char(184, 180, '0' + ((dt.year / 1000) % 10), game_color);
+            draw_char(192, 180, '0' + ((dt.year / 100) % 10), game_color);
+            draw_char(200, 180, '0' + ((dt.year / 10) % 10), game_color);
+            draw_char(208, 180, '0' + (dt.year % 10), game_color);
+            draw_char(216, 180, '/', game_color);
+            draw_char(224, 180, '0' + (dt.month / 10), game_color);
+            draw_char(232, 180, '0' + (dt.month % 10), game_color);
+            draw_char(240, 180, '/', game_color);
+            draw_char(248, 180, '0' + (dt.day / 10), game_color);
+            draw_char(256, 180, '0' + (dt.day % 10), game_color);
 
             delay_ms(16); // Approximately 60 FPS
         }
