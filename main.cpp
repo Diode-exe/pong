@@ -3,6 +3,11 @@
 #include "font8x8_basic.h"
 // --------------------
 
+// --------------------
+// from https://wiki.osdev.org/CMOS#Getting_Current_Date_and_Time_from_RTC
+#include "rtc_utils.h"
+// --------------------
+
 extern "C" {
     // This is the entry point function that multiboot.asm calls
     void kernel_main();
@@ -272,6 +277,29 @@ void kernel_main() {
                 paused = true;
                 clear_screen();
             }
+
+            // elegant solution
+            dateTimeValues dt = read_rtc();
+
+            draw_char(80, 180, '0' + (dt.hour / 10), 0x0F);
+            draw_char(88, 180, '0' + (dt.hour % 10), 0x0F);
+            draw_char(96, 180, ':', 0x0F);
+            draw_char(104, 180, '0' + (dt.minute / 10), 0x0F);
+            draw_char(112, 180, '0' + (dt.minute % 10), 0x0F);
+            draw_char(120, 180, ':', 0x0F);
+            draw_char(128, 180, '0' + (dt.second / 10), 0x0F);
+            draw_char(136, 180, '0' + (dt.second % 10), 0x0F);
+
+            draw_char(184, 180, '0' + ((dt.year / 1000) % 10), 0x0F);
+            draw_char(192, 180, '0' + ((dt.year / 100) % 10), 0x0F);
+            draw_char(200, 180, '0' + ((dt.year / 10) % 10), 0x0F);
+            draw_char(208, 180, '0' + (dt.year % 10), 0x0F);
+            draw_char(216, 180, '/', 0x0F);
+            draw_char(224, 180, '0' + (dt.month / 10), 0x0F);
+            draw_char(232, 180, '0' + (dt.month % 10), 0x0F);
+            draw_char(240, 180, '/', 0x0F);
+            draw_char(248, 180, '0' + (dt.day / 10), 0x0F);
+            draw_char(256, 180, '0' + (dt.day % 10), 0x0F);
 
             delay_ms(16); // Approximately 60 FPS
         }
