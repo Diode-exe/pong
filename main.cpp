@@ -8,6 +8,8 @@
 #include "rtc_utils.h"
 // --------------------
 
+#include "io_byte.h"
+
 extern "C" {
     // This is the entry point function that multiboot.asm calls
     void kernel_main();
@@ -166,6 +168,24 @@ void palette_change() {
     clear_screen();
 }
 
+void resetSystem() {
+    // 1. Disable interrupts so nothing interrupts the reset sequence
+    __asm__ volatile ("cli");
+
+    // 2. Wait until the PS/2 controller's input buffer is clear (bit 1 of 0x64 must be 0)
+    while (in_byte(0x64) & 0x02) {
+        // Spin wait
+    }
+
+    // 3. Send 0xFE to port 0x64 to pulse the CPU reset line
+    out_byte(0x64, 0xFE);
+
+    // 4. Fallback: If hardware doesn't reset immediately, halt the CPU
+    while (true) {
+        __asm__ volatile ("hlt");
+    }
+}
+
 void kernel_main() {
     // Clear screen
     clear_screen();
@@ -220,6 +240,11 @@ void kernel_main() {
             if (keys[0x14]) { // L key for palette change
                 palette_change();
                 keys[0x14] = false; // Reset the key state to prevent continuous cycling
+            }
+
+            if (keys[0x1D] && keys[0x13]) { // Ctrl + R for system reset
+                // Trigger a system reset by writing to the keyboard controller
+                resetSystem();
             }
 
             // Render Paddles

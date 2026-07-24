@@ -1,3 +1,7 @@
+#ifndef RTC_UTILS_H
+#define RTC_UTILS_H
+#include "io_byte.h"
+
 #define CURRENT_YEAR        2026                            // Change this each year!
 
 int century_register = 0x00;                                // Set by ACPI table parsing code if possible
@@ -8,16 +12,6 @@ unsigned char hour;
 unsigned char day;
 unsigned char month;
 unsigned int year;
-
-void out_byte(int port, int value) {
-      __asm__ volatile ("outb %0, %1" : : "a"((unsigned char)value), "Nd"((unsigned short)port));
-}
-
-int in_byte(int port) {
-      unsigned char ret;
-      __asm__ volatile ("inb %1, %0" : "=a"(ret) : "Nd"((unsigned short)port));
-      return ret;
-}
 
 enum {
       cmos_address = 0x70,
@@ -124,3 +118,5 @@ struct dateTimeValues read_rtc() {
 
       return {second, minute, hour, day, month, year};
 }
+
+#endif // RTC_UTILS_H
